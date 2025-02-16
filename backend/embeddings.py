@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 # Initialize OpenAI client
 client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
 def cosine_similarity(vec1, vec2):
@@ -24,7 +25,7 @@ def embed_texts(texts):
     try:
         # Get embeddings from OpenAI
         response = client.embeddings.create(
-            model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+            model=os.getenv("GEMINI_EMBEDDING_MODEL", "text-embedding-004"),
             input=texts
         )
         

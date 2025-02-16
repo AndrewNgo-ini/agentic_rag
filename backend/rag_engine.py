@@ -16,8 +16,37 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # Constants
-DEFAULT_MODEL = "gpt-4o-mini"
+DEFAULT_MODEL = "gemini-2.0-flash"
 AGENT_LOOP_LIMIT = 3
+
+
+def clean_code_block(content):
+    """
+    Clean JSON content that may be wrapped in code blocks.
+    
+    Args:
+        content: String that may contain JSON wrapped in code blocks
+        
+    Returns:
+        str: Cleaned content with code blocks and language identifier removed
+    """
+    if not content:
+        return content
+        
+    # Remove markdown code block wrapping if present
+    if content.startswith('```'):
+        # Find the first and last occurrence of ```
+        start_idx = content.find('\n', content.find('```')) + 1
+        end_idx = content.rfind('```')
+        if end_idx > start_idx:
+            content = content[start_idx:end_idx].strip()
+    
+    # Remove "json" language identifier if present
+    if content.startswith('json\n'):
+        content = content[5:].strip()
+        
+    return content
+
 
 class RAGEngine:
     """
@@ -29,14 +58,15 @@ class RAGEngine:
         """Initialize the RAG engine with OpenAI client and configuration."""
         try:
             self.client = OpenAI(
-                api_key=os.getenv('OPENAI_API_KEY')
+                api_key=os.getenv('GEMINI_API_KEY'),
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
             )
         except Exception as e:
             logger.error(f"Failed to initialize OpenAI client: {e}")
             raise
         
         # Configuration
-        self.model = os.getenv('OPENAI_MODEL', DEFAULT_MODEL)
+        self.model = os.getenv('GEMINI_MODEL', DEFAULT_MODEL)
         self.agent_loop_limit = AGENT_LOOP_LIMIT
         
         # Sample data - in production this would come from a database
@@ -71,24 +101,6 @@ class RAGEngine:
                 }
             }
         ]
-        
-        # Response schema
-        self.context_reasoning = {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "context_reasoning",
-                "schema": {
-                "type": "object",
-                "properties": {
-                    "reasoning": { "type": "string" },
-                    "final_answer": { "type": "string" }
-                },
-                "required": ["reasoning", "final_answer"],
-                "additionalProperties": False
-                },
-                "strict": True
-            }
-        }
         
         # Initial system message
         self.messages = [
@@ -146,7 +158,6 @@ class RAGEngine:
                 model=self.model,
                 messages=self.messages,
                 tools=self.tools,
-                response_format=self.context_reasoning
             )
             
             loop_response = initial_response
@@ -182,15 +193,25 @@ class RAGEngine:
                 ])
 
                 # Final call for tool response and reasoning
+                # Update the system message with JSON response instruction
+                self.messages[0]["content"] += (
+                    " Provide your response in JSON format with 'reasoning' and 'final_answer' keys. "
+                    "The reasoning should explain your thought process, and the final_answer should "
+                    "contain your response to the user."
+                )
                 loop_response = self.client.chat.completions.create(
                     model=self.model,
                     messages=self.messages,
                     tools=self.tools,
-                    response_format=self.context_reasoning
                 )
                 count += 1
             
-            final_response = json.loads(loop_response.choices[0].message.content) if loop_response.choices[0].message.content is not None else {"reasoning": "Stuck in loop", "final_answer": "Error: Stuck in loop"}
+            final_response = (
+                json.loads(clean_code_block(loop_response.choices[0].message.content))
+                if loop_response.choices[0].message.content is not None
+                else {"reasoning": "Stuck in loop", "final_answer": "Error: Stuck in loop"}
+            )
+            
             # Append assistant response
             self.messages.append({"role": "assistant", "content": final_response["final_answer"]})
             return {

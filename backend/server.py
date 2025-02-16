@@ -7,8 +7,8 @@ import os
 import json
 
 # Check for OpenAI API key
-if not os.getenv("OPENAI_API_KEY"):
-    print("Warning: OPENAI_API_KEY environment variable is not set")
+if not os.getenv("GEMINI_API_KEY"):
+    print("Warning: GEMINI_API_KEY environment variable is not set")
 
 app = FastAPI(title="Agentic RAG Chat API")
 

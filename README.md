@@ -2,9 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-API-green.svg)](https://openai.com/)
 
-A fully custom chatbot built with Agentic RAG (Retrieval-Augmented Generation), combining OpenAI models with a local knowledge base for accurate, context-aware, and explainable responses. Features a lightweight, dependency-free frontend and a streamlined FastAPI backend for complete control and simplicity.
+A fully custom chatbot built with Agentic RAG (Retrieval-Augmented Generation), combining Gemini models (free tier) with a local knowledge base for accurate, context-aware, and explainable responses. Features a lightweight, dependency-free frontend and a streamlined FastAPI backend for complete control and simplicity.
 
 ![Demo](demo.gif)
 
@@ -12,7 +11,7 @@ A fully custom chatbot built with Agentic RAG (Retrieval-Augmented Generation), 
 ## Features
 
 - Pure HTML/CSS/JavaScript frontend with no external dependencies
-- FastAPI backend with OpenAI integration
+- FastAPI backend with Gemini integration
 - Agentic RAG implementation with:
   - Context retrieval using embeddings and cosine similarity
   - Step-by-step reasoning with Chain of Thought
@@ -39,7 +38,7 @@ agentic_rag/
 ## Prerequisites
 
 - Python 3.11 or higher
-- OpenAI API key
+- Gemini API key (you can get one for free at google ai studio)
 - Git (for version control)
 
 ## Installation
@@ -67,9 +66,9 @@ cp .env.sample .env
 ```
 Then edit `.env` with your configuration:
 ```
-OPENAI_API_KEY=your-api-key-here
-OPENAI_MODEL=gpt-4o-mini  # or another compatible model
-OPENAI_EMBEDDING_MODEL=text-embedding-3-small # or another compatible model
+GEMINI_API_KEY=your-api-key-here
+GEMINI_MODEL=gemini-2.0-flash  # or another compatible model
+GEMINI_EMBEDDING_MODEL=text-embedding-3-small # or another compatible model
 ```
 
 ## Running the Application
@@ -105,8 +104,8 @@ The application can be configured through environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| OPENAI_API_KEY | Your OpenAI API key | Required |
-| OPENAI_MODEL | OpenAI model to use | gpt-4o-mini |
+| GEMINI_API_KEY | Your Gemini API key | Required |
+| GEMINI_MODEL | Gemini model to use | gemini-2.0-flash |
 | HOST | Backend server host | 0.0.0.0 |
 | PORT | Backend server port | 8000 |
 
@@ -119,37 +118,17 @@ The application includes comprehensive error handling:
 - Detailed logging for debugging and monitoring
 - Graceful fallbacks for common failure scenarios
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -am 'Add feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
-
-Please ensure your code:
-- Includes appropriate tests
-- Follows the existing code style
-- Updates documentation as needed
-- Includes type hints
-- Has meaningful commit messages
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Security
-
-- Never commit your `.env` file or API keys
-- Keep dependencies updated
-- Follow security best practices for production deployment
-- Report security issues through GitHub's security advisory
 
 ## Troubleshooting
 
 Common issues and solutions:
 
-1. **OpenAI API Error**
+1. **Gemini API Error**
    - Verify your API key is correct
    - Check your API usage limits
    - Ensure the model name is valid
@@ -166,6 +145,6 @@ Common issues and solutions:
 
 ## Acknowledgments
 
-- OpenAI for their API and models
+- Gemini for their API and models
 - FastAPI framework
 - Contributors and maintainers
